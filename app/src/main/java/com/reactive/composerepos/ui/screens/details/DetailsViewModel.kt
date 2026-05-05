@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailsScreenViewModel @Inject constructor(
+class DetailsViewModel @Inject constructor(
     savedStateHandle : SavedStateHandle,
     private val getRepoUseCase : GetRepoUseCase,
 ): ViewModel() {

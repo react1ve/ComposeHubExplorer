@@ -1,6 +1,7 @@
 package com.reactive.composerepos.ui.screens.home
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,11 +30,11 @@ fun HomeScreen(
     onDetails : (Repo) -> Unit = {},
     onSearch : () -> Unit = {},
 ) {
-    HomeScreen(hiltViewModel(), onDetails, onSearch)
+    HomeScreenRoute(hiltViewModel<HomeViewModel>(), onDetails, onSearch)
 }
 
 @Composable
-private fun HomeScreen(
+private fun HomeScreenRoute(
     viewModel : HomeViewModel,
     onRepoClick : (Repo) -> Unit = {},
     onSearch : () -> Unit = {},
@@ -71,7 +72,7 @@ private fun HomeScreenContent(
             )
         }
 
-    ) { paddingValues ->
+    ) { paddingValues : PaddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             Spacer(modifier = Modifier.size(8.dp))
 

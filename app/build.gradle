@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.reactive.composerepos"
         minSdk 26
-        targetSdk 31
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -36,7 +36,7 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.11'
+        jvmTarget = '11'
     }
     buildFeatures {
         compose true
@@ -51,6 +51,7 @@ android {
     }
     testOptions {
         animationsDisabled = true
+        unitTests.returnDefaultValues = true
     }
 }
 
@@ -62,6 +63,7 @@ dependencies {
     implementation libs.android.coreKtx
     implementation libs.android.appCompat
     implementation libs.android.material
+    implementation libs.android.navigation.compose
 
     implementation libs.bundles.compose
     implementation libs.lottie.compose
@@ -72,4 +74,8 @@ dependencies {
 
 
     implementation libs.bundles.lifecycle
+
+    testImplementation libs.junit4
+    testImplementation libs.kotlin.coroutines.test
+    testImplementation libs.android.core.testing
 }

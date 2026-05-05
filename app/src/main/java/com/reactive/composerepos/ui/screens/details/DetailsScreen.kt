@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement.SpaceEvenly
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,32 +55,32 @@ import com.reactive.domain.model.User
 @Composable
 fun DetailsScreen(navigateUp : () -> Unit) {
     Surface {
-        DetailsScreen(hiltViewModel(), navigateUp)
+        DetailsScreenRoute(hiltViewModel<DetailsViewModel>(), navigateUp)
     }
 }
 
 @Composable
-fun DetailsScreen(viewModel : DetailsScreenViewModel, navigateUp : () -> Unit) {
+private fun DetailsScreenRoute(viewModel : DetailsViewModel, navigateUp : () -> Unit) {
     val state by viewModel.state.collectAsState()
     Scaffold(topBar = {
         TopAppBar(
             title = { Text("") },
             navigationIcon = { NavigateUp(onClick = navigateUp) }
         )
-    }) {
+    }) { _: PaddingValues ->
         when (state.screenStatus) {
             ScreenStatus.NO_INTERNET -> NetworkErrorScreen()
             ScreenStatus.ERROR -> UnknownErrorScreen()
             ScreenStatus.LOADING -> LoadingScreen(modifier = Modifier.fillMaxSize())
-            ScreenStatus.SUCCESS -> DetailsScreen(state.repo)
+            ScreenStatus.SUCCESS -> DetailsScreenContent(state.repo)
         }
     }
 }
 
 @Composable
-fun DetailsScreen(repo : Repo?) {
+private fun DetailsScreenContent(repo : Repo?) {
     val uriHandler = LocalUriHandler.current
-    repo?.let {
+    if (repo != null) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -195,7 +196,7 @@ private fun DescriptionItem(
 private fun Preview() {
     KotlinRepositoriesTheme() {
         Surface {
-            DetailsScreen(
+            DetailsScreenContent(
                 Repo(
                     id = 1,
                     name = "kotlinReallyReallyReallyLargeName",

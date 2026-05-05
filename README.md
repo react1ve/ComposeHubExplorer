@@ -33,20 +33,28 @@ Main functionality:
   [spotless](https://github.com/diffplug/spotless) for checking code style
   (Kotlin with [ktlint](https://github.com/pinterest/ktlint), XMLs and Gradle Files).
 
-Let me know if you'd like to add or modify any details!
+## Testing
+
+Unit tests are added for the main layers and modules:
+
+* **domain**: UseCases (`GetPagedKotlinReposUseCase`, `SearchReposUseCase`, `GetRepoUseCase`).
+* **data**: Repository, DataSource, mappers (`RepoDtoMapper`, `RepoResultListDtoMapper`,
+  `RepoDboMapper`, `UserDtoMapper`, `UserDboMapper`) and cache (`RepositoryCache`).
+* **app**: ViewModels (`SearchViewModel`, `HomeViewModel`, `DetailsScreenViewModel`) and
+  error-to-UI status mapping extensions.
 
 ## :camera_flash: Screenshots
 
 ### 🌞 Light Mode
 
- Home                                                | Search                                                | Details                                                
------------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------|
- <img src="/screenshots/home_light.png" width="260"> | <img src="/screenshots/search_light.png" width="260"> | <img src="/screenshots/details_light.png" width="260"> 
+| Home                                                | Search                                                | Details                                                 |
+|-----------------------------------------------------|-------------------------------------------------------|---------------------------------------------------------|
+| <img src="/screenshots/home_light.png" width="260"> | <img src="/screenshots/search_light.png" width="260"> | <img src="/screenshots/details_light.png" width="260"> |
 
 ### 🌚 Dark Mode
 
- Home                                               | Search                                               | Details                                               
-----------------------------------------------------|------------------------------------------------------|-------------------------------------------------------|
- <img src="/screenshots/home_dark.png" width="260"> | <img src="/screenshots/search_dark.png" width="260"> | <img src="/screenshots/details_dark.png" width="260"> 
+| Home                                               | Search                                               | Details                                                |
+|----------------------------------------------------|------------------------------------------------------|--------------------------------------------------------|
+| <img src="/screenshots/home_dark.png" width="260"> | <img src="/screenshots/search_dark.png" width="260"> | <img src="/screenshots/details_dark.png" width="260"> |
 
 ## Find this repository useful? :heart:

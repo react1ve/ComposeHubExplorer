@@ -27,7 +27,7 @@ fun SearchScreen(
     onDetails : (Repo) -> Unit = {},
     onNavigateUp : () -> Unit = {},
 ) {
-    SearchScreen(
+    SearchScreenRoute(
         hiltViewModel(),
         onDetails,
         onNavigateUp
@@ -35,7 +35,7 @@ fun SearchScreen(
 }
 
 @Composable
-private fun SearchScreen(
+private fun SearchScreenRoute(
     viewModel : SearchViewModel,
     onRepoClick : (Repo) -> Unit = {},
     onNavigateUp : () -> Unit = {},
@@ -43,7 +43,7 @@ private fun SearchScreen(
     val state by viewModel.state.collectAsState()
     val items = viewModel.searchResult.collectAsLazyPagingItems()
 
-    SearchScreen(
+    SearchScreenContent(
         state = state,
         items = items,
         onQueryChanged = { viewModel.onSearchUpdated(it) },
@@ -53,7 +53,7 @@ private fun SearchScreen(
 }
 
 @Composable
-private fun SearchScreen(
+private fun SearchScreenContent(
     state : SearchState,
     items : LazyPagingItems<Repo>,
     onQueryChanged : (String) -> Unit,
