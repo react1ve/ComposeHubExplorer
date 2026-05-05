@@ -57,6 +57,7 @@ lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 okhttp-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
 paging-common = { module = "androidx.paging:paging-common-ktx", version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging-compose" }
 result-jvm = { module = "com.github.kittinunf.result:result-jvm", version.ref = "result" }
