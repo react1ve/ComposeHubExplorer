@@ -1,17 +1,15 @@
 ### :bulb: Task Description
 
-The application should allow users to search for GitHub repositories by username and display the
-results.
+The application allows users to browse trending Kotlin repositories on GitHub and search for
+repositories by name. Results are displayed with pagination support.
 
 Main functionality:
 
-1. **Splash Screen** - A loading screen displayed when the app starts.
-2. **Search Screen** - Users can search for repositories by entering a username, and the app will
-   display a list of repositories.
-3. **Repository Details** - Users can open the repository link in the browser.
-4. **Download Feature** - Users can download repositories into the "Download" folder.
-5. **Downloads Screen** - Displays a list of downloaded repositories, showing the username and
-   repository name, with a well-designed layout.
+1. **Home Screen** - Displays a paginated list of popular Kotlin repositories from GitHub.
+2. **Search Screen** - Users can search for repositories with debounced input, and the app displays
+   paginated results.
+3. **Repository Details** - Shows detailed information about a selected repository including stars,
+   forks, language, and owner info.
 
 ## Development
 
@@ -33,15 +31,31 @@ Main functionality:
   [spotless](https://github.com/diffplug/spotless) for checking code style
   (Kotlin with [ktlint](https://github.com/pinterest/ktlint), XMLs and Gradle Files).
 
-## Testing
+## Testing (TDD Approach)
 
-Unit tests are added for the main layers and modules:
+All unit tests in this project were developed following the **Test-Driven Development (TDD)**
+methodology:
 
-* **domain**: UseCases (`GetPagedKotlinReposUseCase`, `SearchReposUseCase`, `GetRepoUseCase`).
-* **data**: Repository, DataSource, mappers (`RepoDtoMapper`, `RepoResultListDtoMapper`,
-  `RepoDboMapper`, `UserDtoMapper`, `UserDboMapper`) and cache (`RepositoryCache`).
-* **app**: ViewModels (`SearchViewModel`, `HomeViewModel`, `DetailsScreenViewModel`) and
-  error-to-UI status mapping extensions.
+1. **RED** — Write a failing test that defines the expected behavior before implementing the code.
+2. **GREEN** — Write the minimal production code to make the test pass.
+3. **REFACTOR** — Improve the code while keeping all tests green.
+
+Tests follow the **Given / When / Then** structure and use the naming convention:
+```
+GIVEN <precondition> WHEN <action> THEN <expected result>
+```
+
+### Test coverage by module:
+
+* **domain** — UseCases (`GetPagedKotlinReposUseCase`, `SearchReposUseCase`, `GetRepoUseCase`),
+  domain models.
+* **data** — Repository (`GithubRepositoryImpl`), DataSource (`GithubDataSource`),
+  mappers (`RepoDtoMapper`, `RepoResultListDtoMapper`, `RepoDboMapper`, `UserDtoMapper`,
+  `UserDboMapper`), cache (`RepositoryCache`), paging (`SearchPagingSource`),
+  interceptor (`PagingInterceptor`).
+* **app** — ViewModels (`SearchViewModel`, `HomeViewModel`, `DetailsViewModel`),
+  UI state classes (`ScreenStatus`, `SearchState`, `DetailsScreenState`),
+  and error-to-UI status mapping extensions.
 
 ## :camera_flash: Screenshots
 

@@ -9,22 +9,29 @@ class UserDtoMapperTest {
 
     private val mapper = UserDtoMapper()
 
+    // RED: DTO to Domain should preserve all fields
     @Test
-    fun `mapToDomainModel maps dto to domain`() {
+    fun `GIVEN user dto WHEN mapToDomainModel THEN maps all fields to domain user`() {
+        // Given
         val dto = UserDto(login = "reactive", id = 101, avatarUrl = "avatar")
 
+        // When
         val result = mapper.mapToDomainModel(dto)
 
+        // Then
         assertEquals(User(login = "reactive", id = 101, avatarUrl = "avatar"), result)
     }
 
+    // RED: Domain to DTO should preserve all fields
     @Test
-    fun `mapFromDomainModel maps domain to dto`() {
+    fun `GIVEN domain user WHEN mapFromDomainModel THEN maps all fields to dto`() {
+        // Given
         val domain = User(login = "reactive", id = 101, avatarUrl = "avatar")
 
+        // When
         val result = mapper.mapFromDomainModel(domain)
 
+        // Then
         assertEquals(UserDto(login = "reactive", id = 101, avatarUrl = "avatar"), result)
     }
 }
-

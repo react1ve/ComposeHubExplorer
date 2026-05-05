@@ -39,74 +39,78 @@ class DetailsViewModelTest {
         dispatcher.cleanupTestCoroutines()
     }
 
+    // RED: on successful load, state should contain repo
     @Test
-    fun `init loads repository details successfully`() = dispatcher.runBlockingTest {
+    fun `GIVEN successful repo load WHEN init THEN state contains repo with SUCCESS`() = dispatcher.runBlockingTest {
+        // Given
         val repository = FakeGithubRepository().apply {
             repoResult = successResult(sampleRepo())
         }
 
-        val viewModel = DetailsViewModel(
-            savedStateHandle = SavedStateHandle(
-                mapOf(
-                    "owner" to "reactive",
-                    "name" to "compose-hub",
-                ),
-            ),
-            getRepoUseCase = GetRepoUseCase(repository),
-        )
+        // When
+        val viewModel = createViewModel(repository)
         advanceUntilIdle()
 
-        assertEquals(
-            DetailsScreenState(
-                repo = sampleRepo(),
-                screenStatus = ScreenStatus.SUCCESS,
-            ),
-            viewModel.state.value,
-        )
+        // Then
+        assertEquals(sampleRepo(), viewModel.state.value.repo)
+        assertEquals(ScreenStatus.SUCCESS, viewModel.state.value.screenStatus)
+    }
+
+    // RED: should forward owner and name from SavedStateHandle to use case
+    @Test
+    fun `GIVEN savedStateHandle with owner and name WHEN init THEN delegates to repository`() = dispatcher.runBlockingTest {
+        // Given
+        val repository = FakeGithubRepository().apply {
+            repoResult = successResult(sampleRepo())
+        }
+
+        // When
+        createViewModel(repository)
+        advanceUntilIdle()
+
+        // Then
         assertEquals("reactive", repository.lastOwner)
         assertEquals("compose-hub", repository.lastName)
     }
 
+    // RED: no internet should result in NO_INTERNET status and null repo
     @Test
-    fun `init exposes no internet status when repository loading fails offline`() = dispatcher.runBlockingTest {
+    fun `GIVEN no internet WHEN init THEN state has NO_INTERNET and null repo`() = dispatcher.runBlockingTest {
+        // Given
         val repository = FakeGithubRepository().apply {
             repoResult = failureResult(NoInternetConnectionException())
         }
 
-        val viewModel = DetailsViewModel(
-            savedStateHandle = SavedStateHandle(
-                mapOf(
-                    "owner" to "reactive",
-                    "name" to "compose-hub",
-                ),
-            ),
-            getRepoUseCase = GetRepoUseCase(repository),
-        )
+        // When
+        val viewModel = createViewModel(repository)
         advanceUntilIdle()
 
+        // Then
         assertNull(viewModel.state.value.repo)
         assertEquals(ScreenStatus.NO_INTERNET, viewModel.state.value.screenStatus)
     }
 
+    // RED: unexpected error should result in ERROR status and null repo
     @Test
-    fun `init exposes generic error status when repository loading fails unexpectedly`() = dispatcher.runBlockingTest {
+    fun `GIVEN unexpected error WHEN init THEN state has ERROR and null repo`() = dispatcher.runBlockingTest {
+        // Given
         val repository = FakeGithubRepository().apply {
             repoResult = failureResult(IllegalStateException("boom"))
         }
 
-        val viewModel = DetailsViewModel(
-            savedStateHandle = SavedStateHandle(
-                mapOf(
-                    "owner" to "reactive",
-                    "name" to "compose-hub",
-                ),
-            ),
-            getRepoUseCase = GetRepoUseCase(repository),
-        )
+        // When
+        val viewModel = createViewModel(repository)
         advanceUntilIdle()
 
+        // Then
         assertNull(viewModel.state.value.repo)
         assertEquals(ScreenStatus.ERROR, viewModel.state.value.screenStatus)
     }
-}
 
+    private fun createViewModel(repository: FakeGithubRepository) = DetailsViewModel(
+        savedStateHandle = SavedStateHandle(
+            mapOf("owner" to "reactive", "name" to "compose-hub"),
+        ),
+        getRepoUseCase = GetRepoUseCase(repository),
+    )
+}

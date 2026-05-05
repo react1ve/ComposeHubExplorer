@@ -19,8 +19,10 @@ import org.junit.Test
 
 class GithubRepositoryImplTest {
 
+    // RED: successful datasource response should be wrapped in Result.success
     @Test
-    fun `getKotlinRepo returns success result when datasource succeeds`() = runTest {
+    fun `GIVEN datasource returns repo WHEN getKotlinRepo THEN returns success result`() = runTest {
+        // Given
         val dispatcher = StandardTestDispatcher(testScheduler)
         val dataSource = mockk<GithubDataSource>()
         val database = mockk<RepoDatabase>(relaxed = true)
@@ -29,20 +31,41 @@ class GithubRepositoryImplTest {
         coEvery { dataSource.getRepository("reactive", "compose-hub") } returns expectedRepo
         val repository = GithubRepositoryImpl(dataSource, dispatcher, database, mapper)
 
+        // When
         val result = repository.getKotlinRepo(owner = "reactive", name = "compose-hub")
         advanceUntilIdle()
 
+        // Then
         var actualRepo = sampleRepo().copy(id = -1)
         result
             .onSuccess { actualRepo = it }
-            .onFailure { fail("Expected success result but received failure: $it") }
-
+            .onFailure { fail("Expected success but received failure: $it") }
         assertEquals(expectedRepo, actualRepo)
+    }
+
+    // RED: should delegate to datasource with correct arguments
+    @Test
+    fun `GIVEN owner and name WHEN getKotlinRepo THEN delegates to datasource with same args`() = runTest {
+        // Given
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val dataSource = mockk<GithubDataSource>()
+        val database = mockk<RepoDatabase>(relaxed = true)
+        val mapper = mockk<RepoDboMapper>(relaxed = true)
+        coEvery { dataSource.getRepository("reactive", "compose-hub") } returns sampleRepo()
+        val repository = GithubRepositoryImpl(dataSource, dispatcher, database, mapper)
+
+        // When
+        repository.getKotlinRepo(owner = "reactive", name = "compose-hub")
+        advanceUntilIdle()
+
+        // Then
         coVerify(exactly = 1) { dataSource.getRepository("reactive", "compose-hub") }
     }
 
+    // RED: datasource exception should be wrapped in Result.failure
     @Test
-    fun `getKotlinRepo returns failure result when datasource throws`() = runTest {
+    fun `GIVEN datasource throws WHEN getKotlinRepo THEN returns failure with same exception`() = runTest {
+        // Given
         val dispatcher = StandardTestDispatcher(testScheduler)
         val dataSource = mockk<GithubDataSource>()
         val database = mockk<RepoDatabase>(relaxed = true)
@@ -51,16 +74,15 @@ class GithubRepositoryImplTest {
         coEvery { dataSource.getRepository("reactive", "compose-hub") } throws expectedException
         val repository = GithubRepositoryImpl(dataSource, dispatcher, database, mapper)
 
+        // When
         val result = repository.getKotlinRepo(owner = "reactive", name = "compose-hub")
         advanceUntilIdle()
 
-        var actualException : Exception? = null
+        // Then
+        var actualException: Exception? = null
         result
-            .onSuccess { fail("Expected failure result but received success: $it") }
+            .onSuccess { fail("Expected failure but received success: $it") }
             .onFailure { actualException = it }
-
         assertSame(expectedException, actualException)
-        coVerify(exactly = 1) { dataSource.getRepository("reactive", "compose-hub") }
     }
 }
-

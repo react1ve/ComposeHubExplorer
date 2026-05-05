@@ -9,22 +9,29 @@ class UserDboMapperTest {
 
     private val mapper = UserDboMapper()
 
+    // RED: DBO to Domain should map userId to id
     @Test
-    fun `mapToDomainModel maps dbo to domain`() {
+    fun `GIVEN user dbo WHEN mapToDomainModel THEN maps userId to id and all fields`() {
+        // Given
         val dbo = UserDbo(userId = 101, login = "reactive", avatarUrl = "avatar")
 
+        // When
         val result = mapper.mapToDomainModel(dbo)
 
+        // Then
         assertEquals(User(login = "reactive", id = 101, avatarUrl = "avatar"), result)
     }
 
+    // RED: Domain to DBO should map id to userId
     @Test
-    fun `mapFromDomainModel maps domain to dbo`() {
+    fun `GIVEN domain user WHEN mapFromDomainModel THEN maps id to userId and all fields`() {
+        // Given
         val domain = User(login = "reactive", id = 101, avatarUrl = "avatar")
 
+        // When
         val result = mapper.mapFromDomainModel(domain)
 
+        // Then
         assertEquals(UserDbo(userId = 101, login = "reactive", avatarUrl = "avatar"), result)
     }
 }
-

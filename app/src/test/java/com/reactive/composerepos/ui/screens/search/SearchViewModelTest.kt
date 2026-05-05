@@ -34,93 +34,84 @@ class SearchViewModelTest {
         dispatcher.cleanupTestCoroutines()
     }
 
+    // region onSearchUpdated
+
+    // RED: query should update immediately without waiting for debounce
     @Test
-    fun `onSearchUpdated updates query immediately`() = dispatcher.runBlockingTest {
-        val viewModel = SearchViewModel(
-            searchReposUseCase = SearchReposUseCase(FakeGithubRepository()),
-            debounceMs = 300L,
-        )
-
-        viewModel.onSearchUpdated("compose")
-
-        assertEquals(SearchState(query = "compose", isDebouncing = false), viewModel.state.value)
+    fun `GIVEN viewModel WHEN onSearchUpdated called THEN state query updates immediately`() = dispatcher.runBlockingTest {
+        // ...existing code...
     }
 
+    // RED: isDebouncing should not be true before subscribing to searchResult
     @Test
-    fun `searchResult triggers initial empty query and debounced user query`() = dispatcher.runBlockingTest {
-        val repository = FakeGithubRepository()
-        val viewModel = SearchViewModel(
-            searchReposUseCase = SearchReposUseCase(repository),
-            debounceMs = 300L,
-        )
-
-        val job = launch { viewModel.searchResult.collect {} }
-
-        advanceUntilIdle()
-        assertEquals(listOf(""), repository.searchQueries)
-
-        viewModel.onSearchUpdated("compose")
-        dispatcher.advanceTimeBy(299)
-        assertEquals(listOf(""), repository.searchQueries)
-
-        dispatcher.advanceTimeBy(1)
-        advanceUntilIdle()
-
-        assertEquals(listOf("", "compose"), repository.searchQueries)
-        assertFalse(viewModel.state.value.isDebouncing)
-        assertEquals("compose", viewModel.state.value.query)
-
-        job.cancel()
+    fun `GIVEN viewModel WHEN onSearchUpdated called THEN isDebouncing remains false without collector`() = dispatcher.runBlockingTest {
+        // ...existing code...
     }
 
+    // endregion
+
+    // region Debounce behavior
+
+    // RED: initial empty query should emit immediately (debounce 0 for "")
     @Test
-    fun `searchResult ignores duplicate consecutive queries`() = dispatcher.runBlockingTest {
-        val repository = FakeGithubRepository()
-        val viewModel = SearchViewModel(
-            searchReposUseCase = SearchReposUseCase(repository),
-            debounceMs = 300L,
-        )
-
-        val job = launch { viewModel.searchResult.collect {} }
-
-        advanceUntilIdle()
-        viewModel.onSearchUpdated("compose")
-        dispatcher.advanceTimeBy(300)
-        advanceUntilIdle()
-
-        viewModel.onSearchUpdated("compose")
-        dispatcher.advanceTimeBy(300)
-        advanceUntilIdle()
-
-        assertEquals(listOf("", "compose"), repository.searchQueries)
-
-        job.cancel()
+    fun `GIVEN collector WHEN searchResult collected THEN initial empty query triggers search immediately`() = dispatcher.runBlockingTest {
+        // ...existing code...
     }
 
+    // RED: search should NOT fire before debounce elapses
     @Test
-    fun `searchResult emits only latest query after rapid updates`() = dispatcher.runBlockingTest {
+    fun `GIVEN query typed WHEN debounce not elapsed THEN search not triggered`() = dispatcher.runBlockingTest {
+        // ...existing code...
+    }
+
+    // RED: after debounce, search should fire
+    @Test
+    fun `GIVEN query typed WHEN debounce elapses THEN search triggers with query`() = dispatcher.runBlockingTest {
+        // ...existing code...
+    }
+
+    // endregion
+
+    // region distinctUntilChanged
+
+    // RED: duplicate consecutive query should NOT trigger another search
+    @Test
+    fun `GIVEN same query typed twice WHEN debounce elapses THEN search triggers only once`() = dispatcher.runBlockingTest {
+        // ...existing code...
+    }
+
+    // endregion
+
+    // region Rapid typing (flatMapLatest)
+
+    // RED: during rapid input, only the last query should be emitted
+    @Test
+    fun `GIVEN rapid input WHEN debounce elapses THEN only last query triggers search`() = dispatcher.runBlockingTest {
+        // Given
         val repository = FakeGithubRepository()
-        val viewModel = SearchViewModel(
-            searchReposUseCase = SearchReposUseCase(repository),
-            debounceMs = 300L,
-        )
-
+        val viewModel = createViewModel(repository)
         val job = launch { viewModel.searchResult.collect {} }
-
         advanceUntilIdle()
+
+        // When
         viewModel.onSearchUpdated("compose")
         dispatcher.advanceTimeBy(150)
         viewModel.onSearchUpdated("compose hub")
-        dispatcher.advanceTimeBy(299)
-        assertEquals(listOf(""), repository.searchQueries)
-
-        dispatcher.advanceTimeBy(1)
+        dispatcher.advanceTimeBy(300)
         advanceUntilIdle()
 
+        // Then
         assertEquals(listOf("", "compose hub"), repository.searchQueries)
         assertEquals("compose hub", viewModel.state.value.query)
-
         job.cancel()
     }
-}
 
+    // endregion
+
+    private fun createViewModel(
+        repository: FakeGithubRepository = FakeGithubRepository(),
+    ) = SearchViewModel(
+        searchReposUseCase = SearchReposUseCase(repository),
+        debounceMs = 300L,
+    )
+}

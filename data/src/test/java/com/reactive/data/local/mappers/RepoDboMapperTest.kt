@@ -9,8 +9,10 @@ class RepoDboMapperTest {
 
     private val mapper = RepoDboMapper(UserDboMapper())
 
+    // RED: nullable DBO fields should become empty strings in domain
     @Test
-    fun `mapToDomainModel converts nullable dbo fields to empty strings`() {
+    fun `GIVEN dbo with null fields WHEN mapToDomainModel THEN replaces nulls with empty strings`() {
+        // Given
         val dbo = sampleRepoDbo(
             description = null,
             htmlUrl = null,
@@ -18,22 +20,39 @@ class RepoDboMapperTest {
             language = null,
         )
 
+        // When
         val actual = mapper.mapToDomainModel(dbo)
 
-        assertEquals(
-            sampleRepo().copy(
-                description = "",
-                url = "",
-                homepage = "",
-                language = "",
-            ),
-            actual,
-        )
+        // Then
+        assertEquals("", actual.description)
+        assertEquals("", actual.url)
+        assertEquals("", actual.homepage)
+        assertEquals("", actual.language)
     }
 
+    // RED: non-null DBO fields should map correctly
     @Test
-    fun `mapFromDomainModel converts repo back to dbo`() {
-        assertEquals(sampleRepoDbo(), mapper.mapFromDomainModel(sampleRepo()))
+    fun `GIVEN dbo with all fields WHEN mapToDomainModel THEN maps all values correctly`() {
+        // Given
+        val dbo = sampleRepoDbo()
+
+        // When
+        val actual = mapper.mapToDomainModel(dbo)
+
+        // Then
+        assertEquals(sampleRepo(), actual)
+    }
+
+    // RED: domain to DBO mapping should be lossless
+    @Test
+    fun `GIVEN domain repo WHEN mapFromDomainModel THEN produces correct dbo`() {
+        // Given
+        val domain = sampleRepo()
+
+        // When
+        val actual = mapper.mapFromDomainModel(domain)
+
+        // Then
+        assertEquals(sampleRepoDbo(), actual)
     }
 }
-
